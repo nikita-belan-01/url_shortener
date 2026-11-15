@@ -23,12 +23,16 @@ func New(cost int) *Hasher {
 func (h Hasher) Hash(password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), h.cost)
 	if err != nil {
-		return "", ErrMismatchedHashAndPassword
+		return "", err
 	}
 
 	return string(hash), nil
 }
 
 func (h Hasher) Compare(password, hash string) error {
-	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)); err != nil {
+		return ErrMismatchedHashAndPassword
+	}
+
+	return nil
 }
